@@ -7,11 +7,12 @@
  * @component
  */
 import React, { useState } from 'react';
-import './MyForm.css';
+import './CreateUser.css';
 
-function MyForm() {
+function CreateUser() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmpassword, setconfirmPassword] = useState('');
     const [id, setId] = useState('');
     const [submitted, setSubmitted] = useState('');
 
@@ -34,6 +35,15 @@ function MyForm() {
     }
 
     /**
+     * Event handler for confirm password input change.
+     * Updates the confirm password state with the new value entered by the user.
+     * @param {object} event - The event object.
+     */
+    const handleInputChangeConfirmPassword = (event) => {
+        setconfirmPassword(event.target.value);
+    }
+    
+    /**
      * Event handler for id input change.
      * Updates the id state with the new value entered by the user.
      * @param {object} event - The event object.
@@ -49,16 +59,16 @@ function MyForm() {
      */
     const handleSubmit = (event) => {
         event.preventDefault();
-        const data = { username, id, password};
+        const data = { username, id, password, confirmpassword};
         console.log(data);
-        setSubmitted(`Username: ${username}, ID: ${id}, Password: ${password}`)
+        setSubmitted(`Username: ${username}, ID: ${id}, Password: ${password}, Confirm Password: ${confirmpassword}`)
     }
     return (
-        <div className='userform'>
+        <div>
             <center>
-                <h1>Login Page</h1>
+                <h1>Create New User</h1>
                 <form onSubmit={handleSubmit}>
-                    <label>
+                    <label className="createuser">
                         Name:
                         <input
                             type="text"
@@ -91,14 +101,26 @@ function MyForm() {
                         />
                     </label>
                     <br /><br />
-                    <button type="submit">Log In</button>
-                    <br/>{submitted}<br />
+                    <label>
+                        Confirm Password:
+                        <input
+                            type="password"
+                            value={confirmpassword}
+                            onChange={handleInputChangeConfirmPassword}
+                            placeholder="confirm password"
+                            required
+                        />
+                    </label>
+                    <br /><br />
+                    <button type="submit">create</button>
+                    <p>{submitted}</p>
+                    <br/>
                 </form>
             </center>
         </div>
     )
 }
 
-export default MyForm;
+export default CreateUser;
 
   

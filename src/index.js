@@ -19,6 +19,7 @@ import MyComponent from './MyCompClass';
 import Form from './Forms'
 import TableMain from './Table'
 import MyForm from './MyForm';
+import CreateUser from './CreateUser';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -29,6 +30,7 @@ root.render(
     <Form/>
     <TableMain/> */}
     <MyForm/>
+    <CreateUser/>
   </React.StrictMode>
 );
 
