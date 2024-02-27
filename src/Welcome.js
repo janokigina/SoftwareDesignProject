@@ -2,27 +2,27 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import CreateUser from "./CreateUser";
 import MyForm from "./MyForm";
-import './MyForm.css';
+import logo from './orange-logo.png';
+import './Welcome.css';
 
-React-Router 
+//React-Router 
 function Welcome() {
   return (
     <Router>
+      <div className="top-bar">
+        <img src={logo} alt="Logo" className="logo" />
+        <h1>Welcome to Group1 Project</h1>
         <div>
-        <center>
-       <h1>Welcome to Group1 Project</h1>
-            <p>
-                <Link to="/create">Sign Up </Link>
-            </p>
-            <p>
-                <Link to="/signin">Log in</Link>
-            </p>
-            <Routes>
-            <Route path="/create" element={<CreateUser/>}></Route>
-            <Route path="/signin" element={ <MyForm/>}></Route>
-            </Routes>
-            </center>
+          <Link to="/create">Sign Up</Link>
+          <Link to="/signin">Log In</Link>
         </div>
+      </div>
+      <div className="content-area">
+        <Routes>
+          <Route path="/create" element={<CreateUser/>}></Route>
+          <Route path="/signin" element={<MyForm/>}></Route>
+        </Routes>
+      </div>
     </Router>
   );
 }
