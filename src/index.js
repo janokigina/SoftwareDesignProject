@@ -20,6 +20,7 @@ import Form from './Forms'
 import TableMain from './Table'
 import MyForm from './MyForm';
 import CreateUser from './CreateUser';
+import Welcome from './Welcome';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -28,9 +29,10 @@ root.render(
     <StateExample/>
     <MyFunction/>
     <Form/>
-    <TableMain/> */}
+    <TableMain/> 
     <MyForm/>
-    <CreateUser/>
+    <CreateUser/> */}
+    <Welcome/>
   </React.StrictMode>
 );
 

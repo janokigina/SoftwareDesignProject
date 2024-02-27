@@ -64,60 +64,58 @@ function CreateUser() {
         setSubmitted(`Username: ${username}, ID: ${id}, Password: ${password}, Confirm Password: ${confirmpassword}`)
     }
     return (
-        <div>
-            <center>
-                <h1>Create New User</h1>
-                <form onSubmit={handleSubmit}>
-                    <label className="createuser">
-                        Name:
-                        <input
-                            type="text"
-                            value={username}
-                            onChange={handleInputChangeUsername}
-                            placeholder="username"
-                            required
-                        />
-                    </label>
-                    <br /><br/>
-                    <label>
-                        ID:
-                        <input
-                            type="text"
-                            value={id}
-                            onChange={handleInputChangeId}
-                            placeholder="id"
-                            required
-                        />
-                    </label>
-                    <br /><br />
-                    <label>
-                        Password:
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={handleInputChangePassword}
-                            placeholder="password"
-                            required
-                        />
-                    </label>
-                    <br /><br />
-                    <label>
-                        Confirm Password:
-                        <input
-                            type="password"
-                            value={confirmpassword}
-                            onChange={handleInputChangeConfirmPassword}
-                            placeholder="confirm password"
-                            required
-                        />
-                    </label>
-                    <br /><br />
-                    <button type="submit">create</button>
-                    <p>{submitted}</p>
-                    <br/>
-                </form>
-            </center>
-        </div>
+    <>
+        <h1 className='createuser'>Create New User</h1>
+        <form onSubmit={handleSubmit}>
+            <label>
+                Name:
+                <input
+                    type="text"
+                    value={username}
+                    onChange={handleInputChangeUsername}
+                    placeholder="username"
+                    required
+                />
+            </label>
+            <br /><br/>
+            <label>
+                ID:
+                <input
+                    type="text"
+                    value={id}
+                    onChange={handleInputChangeId}
+                    placeholder="id"
+                    required
+                />
+            </label>
+            <br /><br />
+            <label>
+                Password:
+                <input
+                    type="password"
+                    value={password}
+                    onChange={handleInputChangePassword}
+                    placeholder="password"
+                    required
+                />
+            </label>
+            <br /><br />
+            <label>
+                Confirm Password:
+                <input
+                    type="password"
+                    value={confirmpassword}
+                    onChange={handleInputChangeConfirmPassword}
+                    placeholder="confirm password"
+                    required
+                />
+            </label>
+            <br /><br />
+            <button type="submit">create</button>
+            <p>{submitted}</p>
+            <br/>
+        </form>
+    </> 
     )
 }
 

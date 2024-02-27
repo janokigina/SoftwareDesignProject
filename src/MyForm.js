@@ -8,6 +8,8 @@
  */
 import React, { useState } from 'react';
 import './MyForm.css';
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import CreateUser from './CreateUser';
 
 function MyForm() {
     const [username, setUsername] = useState('');
@@ -54,9 +56,8 @@ function MyForm() {
         setSubmitted(`Username: ${username}, ID: ${id}, Password: ${password}`)
     }
     return (
-        <div className='userform'>
-            <center>
-                <h1>Login Page</h1>
+        <>
+                <h1 className='userform'>Login Page</h1>
                 <form onSubmit={handleSubmit}>
                     <label>
                         Name:
@@ -94,8 +95,7 @@ function MyForm() {
                     <button type="submit">Log In</button>
                     <br/>{submitted}<br />
                 </form>
-            </center>
-        </div>
+        </>
     )
 }
 

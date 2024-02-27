@@ -19,6 +19,7 @@ button{
     letter-spacing: 1px;
     width: 200px;
     height: 50px;
+    border-radius: 4px;
 }
 input{
         height: 46px;
@@ -32,3 +33,5 @@ div{
     margin-left: 25%;
     margin-right: 25%;
 }
+
+
