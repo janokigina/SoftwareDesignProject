@@ -10,6 +10,8 @@ import React, { useState } from 'react';
 import './MyForm.css';
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import CreateUser from './CreateUser';
+import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function MyForm() {
     const [username, setUsername] = useState('');
@@ -18,7 +20,7 @@ function MyForm() {
     const [submitted, setSubmitted] = useState(false);
     const [error, setError] = useState(false);
     const [loginMessage, setLoginMessage] = useState('');
-
+    const navigate = useNavigate();
     /**
      * Event handler for username input change.
      * Updates the username state with the new value entered by the user.
@@ -67,6 +69,7 @@ function MyForm() {
             if(data.code===200){
                 setLoginMessage("correct login for user: " + data.username)
                 setError(false);
+                navigate("/projects", { state: { username: data.username, valid: true } })
             }
             else{
                 setLoginMessage("response code: " + data.code + " response message: " + data.error);
