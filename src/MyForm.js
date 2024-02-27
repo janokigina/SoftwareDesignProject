@@ -15,7 +15,9 @@ function MyForm() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [id, setId] = useState('');
-    const [submitted, setSubmitted] = useState('');
+    const [submitted, setSubmitted] = useState(false);
+    const [error, setError] = useState(false);
+    const [loginMessage, setLoginMessage] = useState('');
 
     /**
      * Event handler for username input change.
@@ -53,8 +55,26 @@ function MyForm() {
         event.preventDefault();
         const data = { username, id, password};
         console.log(data);
-        setSubmitted(`Username: ${username}, ID: ${id}, Password: ${password}`)
+        //setSubmitted(`Username: ${username}, ID: ${id}, Password: ${password}`)
+        setSubmitted(true);
+        var fetchURL = "/process_login/" + username + "/" + id + "/" + password;
+
+        fetch(fetchURL)
+
+        .then(response => response.text())
+        .then(function(data) {
+            data = JSON.parse(data);
+            if(data.code===200){
+                setLoginMessage("correct login for user: " + data.username)
+                setError(false);
+            }
+            else{
+                setLoginMessage("response code: " + data.code + " response message: " + data.error);
+                setError(true);
+            }
+        });
     }
+
     return (
         <>
                 <h1 className='userform'>Login Page</h1>
@@ -93,7 +113,7 @@ function MyForm() {
                     </label>
                     <br /><br />
                     <button type="submit">Log In</button>
-                    <br/>{submitted}<br />
+                    <p>{loginMessage}</p>
                 </form>
         </>
     )

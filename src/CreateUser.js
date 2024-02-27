@@ -8,13 +8,16 @@
  */
 import React, { useState } from 'react';
 import './CreateUser.css';
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
 function CreateUser() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmpassword, setconfirmPassword] = useState('');
     const [id, setId] = useState('');
-    const [submitted, setSubmitted] = useState('');
+    const [submitted, setSubmitted] = useState('flase');
+    const [error, setError] = useState('false');
+    const [createMessage, setCreateMessage] = useState('');
 
     /**
      * Event handler for username input change.
@@ -61,7 +64,23 @@ function CreateUser() {
         event.preventDefault();
         const data = { username, id, password, confirmpassword};
         console.log(data);
-        setSubmitted(`Username: ${username}, ID: ${id}, Password: ${password}, Confirm Password: ${confirmpassword}`)
+        //setSubmitted(`Username: ${username}, ID: ${id}, Password: ${password}, Confirm Password: ${confirmpassword}`)
+        setSubmitted(true);
+        var fetchURL = "/process_signup/" + username + "/" + id + "/" + password + "/" + confirmpassword;
+        fetch(fetchURL)
+
+        .then(response => response.text())
+        .then(function(data) {
+            data = JSON.parse(data);
+            if(data.code===200){
+                setCreateMessage("created account for user: " + data.username)
+                setError(false);
+            }
+            else{
+                setCreateMessage("response code: " + data.code + " response message: " + data.error);
+                setError(true);
+            }
+        });
     }
     return (
     <>
@@ -112,8 +131,8 @@ function CreateUser() {
             </label>
             <br /><br />
             <button type="submit">create</button>
-            <p>{submitted}</p>
-            <br/>
+            <br/><br/>
+            <p>{createMessage}</p>
         </form>
     </> 
     )
