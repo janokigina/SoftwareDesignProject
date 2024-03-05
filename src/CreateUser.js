@@ -84,6 +84,7 @@ function CreateUser() {
             if (data.code === 200) {
                 setCreateMessage("Created account for user: " + data.username);
                 setError(false);
+                navigate("/projects", { state: { username: data.username, valid: true } });
             } else {
                 setCreateMessage("Response code: " + data.code + " Response message: " + data.error);
                 setError(true);
