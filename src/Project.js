@@ -11,7 +11,51 @@ function ProjectRen() {
     return (
         <div>
             <h1>{location.state.valid ? "Welcome " + location.state.username : "Please Log In"}</h1>
-            <p>{""}</p>
+            <h3>{"Create project"}</h3>
+            <form>
+                <label>
+                    Project Name:
+                    <input
+                        type="text"
+                        placeholder="project name"
+                        required
+                    />
+                </label>
+                <br /><br/>
+                <label>
+                    Description:
+                    <input
+                        type="text"
+                        placeholder="description"
+                        required
+                    />
+                </label>
+                <br /><br />
+                <label>
+                    Project ID
+                    <input
+                        type="text"
+                        placeholder="project id"
+                        required
+                    />
+                </label>
+                <br /><br />
+                <button type="submit">Create Project</button>
+            </form>
+            <br/><br/>
+            <h3>Join Project</h3>
+            <form>
+                <label>
+                    Project ID
+                    <input
+                        type="text"
+                        placeholder="project id"
+                        required
+                    />
+                </label>
+                <br /><br />
+                <button type="submit">Join Project</button>
+            </form>
         </div>
     );
 }
