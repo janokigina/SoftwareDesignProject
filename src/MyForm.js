@@ -55,28 +55,36 @@ function MyForm() {
      */
     const handleSubmit = (event) => {
         event.preventDefault();
-        const data = { username, id, password};
-        console.log(data);
-        //setSubmitted(`Username: ${username}, ID: ${id}, Password: ${password}`)
+        const data = { username, password }; // Removed ID
         setSubmitted(true);
-        var fetchURL = "/process_login/" + username + "/" + id + "/" + password;
-
-        fetch(fetchURL)
-
-        .then(response => response.text())
-        .then(function(data) {
-            data = JSON.parse(data);
-            if(data.code===200){
-                setLoginMessage("correct login for user: " + data.username)
-                setError(false);
-                navigate("/projects", { state: { username: data.username, valid: true } })
+    
+        fetch('http://localhost:5000/process_signup', { // Changed to POST request
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            else{
-                setLoginMessage("response code: " + data.code + " response message: " + data.error);
+            return response.json();
+        })
+        .then(data => {
+            if(data.code === 200){
+                setLoginMessage("Correct login for user: " + data.username);
+                setError(false);
+                navigate("/projects", { state: { username: data.username, valid: true } });
+            } else {
+                setLoginMessage("Response code: " + data.code + " Response message: " + data.error);
                 setError(true);
             }
+        })
+        .catch(error => {
+            setLoginMessage("Login failed: " + error.message);
+            setError(true);
         });
     }
+    
 
     return (
         <>

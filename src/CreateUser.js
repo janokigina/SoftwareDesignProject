@@ -60,28 +60,42 @@ function CreateUser() {
      * Prevents the default form submission behavior and logs the form data.
      * @param {object} event - The event object.
      */
+
     const handleSubmit = (event) => {
         event.preventDefault();
-        const data = { username, id, password, confirmpassword};
-        console.log(data);
-        //setSubmitted(`Username: ${username}, ID: ${id}, Password: ${password}, Confirm Password: ${confirmpassword}`)
-        setSubmitted(true);
-        var fetchURL = "/process_signup/" + username + "/" + id + "/" + password + "/" + confirmpassword;
-        fetch(fetchURL)
-
-        .then(response => response.text())
-        .then(function(data) {
-            data = JSON.parse(data);
-            if(data.code===200){
-                setCreateMessage("created account for user: " + data.username)
-                setError(false);
+        if (password !== confirmpassword) {
+            setCreateMessage("Passwords do not match.");
+            return;
+        }
+    
+        const data = { username, id, password };
+        fetch('http://localhost:5000/process_signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-            else{
-                setCreateMessage("response code: " + data.code + " response message: " + data.error);
+            return response.json();
+        })
+        .then(data => {
+            if (data.code === 200) {
+                setCreateMessage("Created account for user: " + data.username);
+                setError(false);
+            } else {
+                setCreateMessage("Response code: " + data.code + " Response message: " + data.error);
                 setError(true);
             }
+        })
+        .catch(error => {
+            setCreateMessage("Failed to create account: " + error.message);
+            setError(true);
         });
     }
+    
+
     return (
     <>
         <h1 className='createuser'>Create New User</h1>
