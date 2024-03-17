@@ -58,7 +58,7 @@ function MyForm() {
         const data = { username, password }; // Removed ID
         setSubmitted(true);
     
-        fetch('http://localhost:5000/process_signup', { // Changed to POST request
+        fetch('process_login', { // Changed to POST request
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)

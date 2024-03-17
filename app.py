@@ -16,13 +16,19 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 uri = os.environ.get("MONGODB_URI")
+print("MongoDB URI: ", uri)
 # Create a new client and connect to the server
 client = MongoClient(uri, server_api=ServerApi('1'))
 
 
 UserDB = client.Users  
+ProjectDB = client.Projects
+projects = ProjectDB.project1
 users = UserDB.users1
 
+#Login and Signup logic
+#
+#
 @app.route('/process_login', methods=['POST'])
 @cross_origin()
 def process_login():
@@ -51,13 +57,33 @@ def process_signup():
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
     # Check if user already exists
-    if users.find_one({"username": username}):
+    if users.find_one({"id": id}):
         return jsonify({"error": "User already exists", "code": 409}), 409
 
     # Add user to database
     new_user = {"username": username, "password": hashed_password, "id": id}
     users.insert_one(new_user)
     return jsonify({"username": username, "code": 200}), 200
+
+#Project Management Logic
+#
+#
+@app.route('/create_project', methods=['POST'])
+def create_project():
+    data = request.json
+    projectName = data.get('projectName')
+    description = data.get('description')
+    projectId = data.get('projectId')  # Adjusted to 'projectId' for consistency
+
+    try:
+        new_project = {"projectName": projectName, "description": description, "projectId": projectId}
+        projects.insert_one(new_project)
+        return jsonify({"message": "Project created successfully", "projectId": projectId, "code": 200}), 201
+    except Exception as e:
+        # Handle any database errors
+        return jsonify({"error": str(e), "code": 500}), 500
+
+
 
 @app.route('/')
 def index():

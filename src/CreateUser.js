@@ -8,9 +8,10 @@
  */
 import React, { useState } from 'react';
 import './CreateUser.css';
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from "react-router-dom";
 
 function CreateUser() {
+    const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmpassword, setconfirmPassword] = useState('');
@@ -69,7 +70,7 @@ function CreateUser() {
         }
     
         const data = { username, id, password };
-        fetch('http://localhost:5000/process_signup', {
+        fetch('/process_signup', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
