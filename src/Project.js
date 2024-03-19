@@ -8,6 +8,7 @@ function ProjectRen() {
     const [projectName, setProjectName] = useState('');
     const [description, setDescription] = useState('');
     const [projectId, setProjectId] = useState('');
+    const [projectjoinId, setProjectjoinId] = useState('');
     const [projectMessage, setProjectMessage] = useState('');
 
     const handleSetProjectName = (event) => {
@@ -21,6 +22,10 @@ function ProjectRen() {
     const handleSetProjectId = (event) => {
         setProjectId(event.target.value);
     };
+
+    const handleSetProjectjoinId = (event) => {
+        setProjectjoinId(event.target.value);
+    }
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -43,8 +48,25 @@ function ProjectRen() {
         }
     };
 
-    const handleJoinProject = () => {
-        navigate('/resources', { state: { projectName: projectName } });
+    const handleJoinProject = async(event) => {
+        event.preventDefault();
+        const data = { projectId: projectjoinId };
+        const response = await fetch('/join_project', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+
+        const responseData = await response.json();
+
+        if (response.ok) {
+            setProjectMessage("Project joined successfully!");
+            navigate('/resources', { state: { projectName: projectName } });
+        }else{
+            setProjectMessage("Error joining project: " + responseData.error);
+        }
     };
 
     return (
@@ -75,7 +97,7 @@ function ProjectRen() {
             <form onSubmit={handleJoinProject}>
                 <label>
                     Project ID:
-                    <input type="text" placeholder="project id" required />
+                    <input type="text" value={projectjoinId} onChange={handleSetProjectjoinId} placeholder="project id" required />
                 </label>
                 <br /><br />
                 <button type="submit">Join Project</button>
