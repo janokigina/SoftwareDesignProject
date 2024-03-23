@@ -61,7 +61,7 @@ def process_signup():
         return jsonify({"error": "User already exists", "code": 409}), 409
 
     # Add user to database
-    new_user = {"username": username, "password": hashed_password, "id": id}
+    new_user = {"username": username, "password": hashed_password, "id": id, "projects": []}
     users.insert_one(new_user)
     return jsonify({"username": username, "code": 200}), 200
 
@@ -75,6 +75,10 @@ def create_project():
     description = data.get('description')
     projectId = data.get('projectId')  # Adjusted to 'projectId' for consistency
 
+     # Check if user already exists
+    if projects.find_one({"projectId": id}):
+        return jsonify({"error": "Project already exists", "code": 409}), 409
+    
     try:
         new_project = {"projectName": projectName, "description": description, "projectId": projectId}
         projects.insert_one(new_project)
@@ -82,6 +86,38 @@ def create_project():
     except Exception as e:
         # Handle any database errors
         return jsonify({"error": str(e), "code": 500}), 500
+    
+
+
+@app.route('/join_project', methods=['POST'])
+def join_project():
+    data = request.get_json()
+    print("Received data:", data)  # Log the received data
+
+    join_project_id = data.get('joinProjectId')
+    user_id = data.get('id')
+    
+
+    # Check if project ID is provided
+    if not join_project_id:
+        return jsonify({'error': 'Missing project ID'}), 400
+
+    try:
+        # Check if the user exists
+        user = users.find_one({"id": user_id})
+        if not user:
+            return jsonify({'error': 'User not found'}), 405
+
+        # Update the user's document
+        result = users.update_one({"id": user_id}, {"$push": {"projects": join_project_id}})
+        if result.modified_count > 0:
+            return jsonify({'message': 'Project joined successfully!'}), 200
+        else:
+            return jsonify({'error': 'Failed to join project'}), 500
+    except Exception as e:
+        # Log the error (consider using logging library)
+        print(f"Database error: {e}")
+        return jsonify({'error': 'Database error'}), 500
 
 
 

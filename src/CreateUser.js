@@ -54,6 +54,7 @@ function CreateUser() {
      */
     const handleInputChangeId = (event) => {
         setId(event.target.value);
+        localStorage.setItem('userId', event.target.value);
     }
 
     /**
@@ -85,7 +86,8 @@ function CreateUser() {
             if (data.code === 200) {
                 setCreateMessage("Created account for user: " + data.username);
                 setError(false);
-                navigate("/projects", { state: { username: data.username, valid: true } });
+                localStorage.setItem('userId', data.id);
+                navigate("/projects", { state: { username: data.username, id: data.id, valid: true } });
             } else {
                 setCreateMessage("Response code: " + data.code + " Response message: " + data.error);
                 setError(true);

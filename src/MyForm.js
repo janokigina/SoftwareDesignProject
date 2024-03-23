@@ -45,7 +45,9 @@ function MyForm() {
      * @param {object} event - The event object.
      */
     const handleInputChangeId = (event) => {
+
         setId(event.target.value);
+        localStorage.setItem('userId', event.target.value);
     }
 
     /**
@@ -55,7 +57,7 @@ function MyForm() {
      */
     const handleSubmit = (event) => {
         event.preventDefault();
-        const data = { username, password }; // Removed ID
+        const data = { username, id, password }; // Removed ID
         setSubmitted(true);
     
         fetch('process_login', { // Changed to POST request
