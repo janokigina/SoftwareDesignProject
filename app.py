@@ -105,3 +105,111 @@ def not_found(e):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=os.environ.get('PORT', 5000), debug=os.environ.get('DEBUG', 'False') == 'True')
+
+# # Resource Management Logic
+# #
+# #
+
+
+#  # Reference to the HardwareSet collection
+# hardware_set = ProjectDB.HardwareSet
+
+# # List available resources
+# @app.route('/resources', methods=['GET'])
+# def list_resources():
+#     resources = list(hardware_set.find({}, {'_id': 0}))
+#     return jsonify(resources), 200
+
+# # Check out resource
+# @app.route('/checkout', methods=['POST'])
+# def checkout_resource():
+#     data = request.json
+#     resource_id = data['resource_id']
+#     units_to_checkout = data['units']
+#     result = hardware_set.update_one({'_id': resource_id, 'available_units': {'$gte': units_to_checkout}},
+#                                      {'$inc': {'available_units': -units_to_checkout}})
+#     if result.modified_count:
+#         return jsonify({'message': 'Resource checked out successfully'}), 200
+#     else:
+#         return jsonify({'error': 'Resource could not be checked out or insufficient units'}), 400
+
+# # Check in resource
+# @app.route('/checkin', methods=['POST'])
+# def checkin_resource():
+#     data = request.json
+#     resource_id = data['resource_id']
+#     units_to_checkin = data['units']
+#     result = hardware_set.update_one({'_id': resource_id},
+#                                      {'$inc': {'available_units': units_to_checkin}})
+#     if result.modified_count:
+#         return jsonify({'message': 'Resource checked in successfully'}), 200
+#     else:
+#         return jsonify({'error': 'Resource could not be checked in'}), 400
+
+# # Add new resource
+# @app.route('/add_resource', methods=['POST'])
+# def add_resource():
+#     data = request.json
+#     # Include validation and sanitization as necessary
+#     result = hardware_set.insert_one(data)
+#     return jsonify({'message': 'New resource added', 'resource_id': str(result.inserted_id)}), 201
+
+# # Update resource details
+# @app.route('/update_resource/<resource_id>', methods=['PATCH'])
+# def update_resource(resource_id):
+#     data = request.json
+#     result = hardware_set.update_one({'_id': resource_id}, {'$set': data})
+#     if result.modified_count:
+#         return jsonify({'message': 'Resource updated successfully'}), 200
+#     else:
+#         return jsonify({'error': 'Resource could not be updated'}), 400
+    
+
+    # Hardware Resource Management
+
+ResourcesDB = client.Resources
+resources = ResourcesDB.resources1
+
+@app.route('/get_hardware_state', methods=['POST'])
+@cross_origin()
+def get_hardware_state():
+    data = request.json
+    hardwareSetId = data.get('hardwareSetId')
+
+    resource = resources.find_one({"hardwareSetId": hardwareSetId}, {"_id": 0})  # Exclude MongoDB's default _id field from the response
+
+    if resource:
+        return jsonify(resource), 200
+    else:
+        return jsonify({"error": "Hardware set not found", "code": 404}), 404
+
+
+@app.route('/checkout_hardware', methods=['POST'])
+@cross_origin()
+def checkout_hardware():
+    data = request.json
+    hardwareSetId = data['hardwareSetId']
+    quantity = int(data['quantity'])
+    
+    resource = resources.find_one({"hardwareSetId": hardwareSetId})
+    if resource and resource['availability'] >= quantity:
+        new_availability = resource['availability'] - quantity
+        resources.update_one({"hardwareSetId": hardwareSetId}, {"$set": {"availability": new_availability}})
+        return jsonify({"message": "Hardware checked out successfully", "code": 200}), 200
+    else:
+        return jsonify({"error": "Not enough hardware available", "code": 400}), 400
+
+@app.route('/checkin_hardware', methods=['POST'])
+@cross_origin()
+def checkin_hardware():
+    data = request.json
+    hardwareSetId = data['hardwareSetId']
+    quantity = int(data['quantity'])
+    
+    resource = resources.find_one({"hardwareSetId": hardwareSetId})
+    if resource:
+        new_availability = min(resource['capacity'], resource['availability'] + quantity)
+        resources.update_one({"hardwareSetId": hardwareSetId}, {"$set": {"availability": new_availability}})
+        return jsonify({"message": "Hardware checked in successfully", "code": 200}), 200
+    else:
+        return jsonify({"error": "Hardware set not found", "code": 404}), 404
