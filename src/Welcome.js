@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import CreateUser from "./CreateUser";
 import MyForm from "./MyForm";
 import ProjectRen from "./Project";
+import ResourceManagement from "./Resource";
 import logo from './orange-logo.png';
 import './Welcome.css';
 
@@ -23,6 +24,7 @@ function Welcome() {
           <Route path="/create" element={<CreateUser/>}></Route>
           <Route path="/signin" element={<MyForm/>}></Route>
           <Route path="/projects" element={<ProjectRen/>}></Route>
+          <Route path="/resources" element={<ResourceManagement />} />
         </Routes>
       </div>
     </Router>

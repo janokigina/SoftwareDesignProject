@@ -10,7 +10,8 @@ function ProjectRen() {
     const [user, setUser] = useState({ username: '', id: '', valid: false });
     const [projectName, setProjectName] = useState('');
     const [description, setDescription] = useState('');
-    const [projectId, setProjectId] = useState('')
+    const [projectId, setProjectId] = useState('');
+    const [projectjoinId, setProjectjoinId] = useState('');
     const [projectMessage, setProjectMessage] = useState('');
     const [joinMessage, setJoinMessage] = useState('');
     const [joinProjectId, setJoinProjectId] = useState('');
@@ -48,7 +49,7 @@ function ProjectRen() {
     }, [location, navigate]);
 
 
-     const handleSubmit = async (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         const data = { projectName, description, projectId };
         const response = await fetch('/create_project', {
@@ -63,6 +64,7 @@ function ProjectRen() {
 
         if (response.ok) {
             setProjectMessage("Project created successfully!");
+            navigate('/resources', { state: { projectName: projectName } });
         } else {
             setProjectMessage("Error creating project: " + responseData.error);
         }
@@ -91,45 +93,27 @@ function ProjectRen() {
     return (
         <div>
             <h1>{location.state.valid ? "Welcome " + location.state.username : "Please Log In"}</h1>
-            <h3>{"Create project"}</h3>
+            <h3>Create project</h3>
             <form onSubmit={handleSubmit}>
                 <label>
                     Project Name:
-                    <input
-                        type="text"
-                        value={projectName}
-                        onChange={handleSetProjectName}
-                        placeholder="project name"
-                        required
-                    />
+                    <input type="text" value={projectName} onChange={handleSetProjectName} placeholder="project name" required />
                 </label>
-                <br /><br/>
+                <br /><br />
                 <label>
                     Description:
-                    <input
-                        type="text"
-                        value={description}
-                        onChange={handleSetDescription}
-                        placeholder="description"
-                        required
-                    />
+                    <input type="text" value={description} onChange={handleSetDescription} placeholder="description" required />
                 </label>
                 <br /><br />
                 <label>
                     Project ID
-                    <input
-                        type="text"
-                        value={projectId}
-                        onChange={handleSetProjectId}
-                        placeholder="project id"
-                        required
-                    />
+                    <input type="text" value={projectId} onChange={handleSetProjectId} placeholder="project id" required />
                 </label>
                 <br /><br />
                 <button type="submit">Create Project</button>
             </form> 
             {projectMessage && <p>{projectMessage}</p>}
-            <br/>
+            <br />
             <h3>Join Project</h3>
             <form onSubmit = {handleSubmit2}>
                 <label>
@@ -157,4 +141,5 @@ const Project = () => {
       </>
     );
   };
+
 export default ProjectRen;

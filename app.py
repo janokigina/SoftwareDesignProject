@@ -87,6 +87,7 @@ def create_project():
         # Handle any database errors
         return jsonify({"error": str(e), "code": 500}), 500
     
+<<<<<<< HEAD
 
 
 @app.route('/join_project', methods=['POST'])
@@ -118,6 +119,17 @@ def join_project():
         # Log the error (consider using logging library)
         print(f"Database error: {e}")
         return jsonify({'error': 'Database error'}), 500
+=======
+@app.route('/join_project', methods=['POST'])
+def join_project():
+    data = request.json
+    projectId = data.get('projectId')
+    print
+    if projects.find_one({"projectId": projectId}):
+        return jsonify({"message": "Project created successfully", "projectId": projectId, "code": 200}), 200
+   
+    return jsonify({"error": "Project not found", "code": 404}), 404
+>>>>>>> ae98276421e7c07b40ffdf2d93b9137f5f4dae50
 
 
 
