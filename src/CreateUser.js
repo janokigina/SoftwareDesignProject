@@ -11,7 +11,7 @@ import React, { useState } from 'react';
 import './CreateUser.css';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from "react-router-dom";
 
-function CreateUser() {
+function CreateUser({ setLoggedIn }) {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -87,11 +87,13 @@ function CreateUser() {
             if (data.code === 200) {
                 setCreateMessage("Created account for user: " + data.username);
                 setError(false);
+                setLoggedIn(true);
                 localStorage.setItem('userId', data.id);
                 navigate("/projects", { state: { username: data.username, id: data.id, valid: true } });
             } else {
                 setCreateMessage("Response code: " + data.code + " Response message: " + data.error);
                 setError(true);
+                setLoggedIn(false);
             }
         })
         .catch(error => {

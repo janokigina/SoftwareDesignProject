@@ -13,7 +13,7 @@ import CreateUser from './CreateUser';
 import { Navigate } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
-function MyForm() {
+function MyForm({ setLoggedIn }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [id, setId] = useState('');
@@ -75,10 +75,12 @@ function MyForm() {
             if(data.code === 200){
                 setLoginMessage("Correct login for user: " + data.username);
                 setError(false);
+                setLoggedIn(true);
                 navigate("/projects", { state: { username: data.username, valid: true } });
             } else {
                 setLoginMessage("Response code: " + data.code + " Response message: " + data.error);
                 setError(true);
+                setLoggedIn(false);
             }
         })
         .catch(error => {

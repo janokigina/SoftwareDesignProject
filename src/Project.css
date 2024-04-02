@@ -1,0 +1,14 @@
+.project-list {
+    list-style: none;
+    padding: 0;
+}
+
+.project-list li {
+    cursor: pointer;
+    color: #bf5700;
+    margin-bottom: 5px;
+}
+
+.project-list li:hover {
+    text-decoration: underline;
+}

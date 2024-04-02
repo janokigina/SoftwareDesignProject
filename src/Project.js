@@ -2,6 +2,7 @@
     
 import React, { useState, useEffect } from 'react';
 import {Navigate, useLocation} from 'react-router-dom';
+import './Project.css';
 import { useNavigate } from "react-router-dom";
 
 function ProjectRen() {
@@ -15,6 +16,8 @@ function ProjectRen() {
     const [projectMessage, setProjectMessage] = useState('');
     const [joinMessage, setJoinMessage] = useState('');
     const [joinProjectId, setJoinProjectId] = useState('');
+    const [userProjects, setUserProjects] = useState([]);
+
 
 
     const handleSetProjectName = (event) => {
@@ -46,12 +49,14 @@ function ProjectRen() {
                 navigate("/signin");
             }
         }
+        fetchUserProjects();
     }, [location, navigate]);
 
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        const data = { projectName, description, projectId };
+        const userId = localStorage.getItem("userId");
+        const data = { projectName, description, projectId, userId };
         const response = await fetch('/create_project', {
             method: 'POST',
             headers: {
@@ -72,7 +77,7 @@ function ProjectRen() {
 
     const handleSubmit2 = async (event) => {
         event.preventDefault();
-        const data = { joinProjectId, id: localStorage.getItem("userId") };
+        const data = { 'projectId': joinProjectId, 'userId': localStorage.getItem("userId") };
         const response = await fetch('/join_project', {
             method: 'POST',
             headers: {
@@ -81,14 +86,59 @@ function ProjectRen() {
             body: JSON.stringify(data),
         });
         const responseData = await response.json();
-
+    
         if (response.ok) {  
             setJoinMessage("Project joined successfully!");
+    
+            // Fetch project details after successfully joining the project
+            const projectResponse = await fetch(`/get_user_projects`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 'userId': localStorage.getItem("userId") }),
+            });
+            const projectData = await projectResponse.json();
+    
+            // Find the joined project in the user's projects list
+            const joinedProject = projectData.find(project => project.projectId === joinProjectId);
+            if (joinedProject) {
+                // Set projectName based on the fetched project details
+                setProjectName(joinedProject.projectName);
+    
+                // Navigate to the resources page with the updated projectName state
+                navigate('/resources', { state: { projectName: joinedProject.projectName } });
+            } else {
+                // Handle error if the joined project is not found
+                setJoinMessage("Error: Joined project details not found");
+            }
         } else {
+            // Handle error if joining project fails
             setJoinMessage("Error joining project: " + responseData.error);
         }
     };
-    
+
+    const fetchUserProjects = async () => {
+        const userId = localStorage.getItem("userId");
+        const response = await fetch('/get_user_projects', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 'userId': userId }),
+        });
+        const responseData = await response.json();
+
+        if (response.ok) {
+            setUserProjects(responseData);
+        } else {
+            console.error("Error fetching user projects:", responseData.error);
+        }
+    };
+
+    const handleProjectClick = (projectName) => {
+        navigate('/resources', { state: { projectName: projectName } });
+    };
    
     return (
         <div>
@@ -130,6 +180,14 @@ function ProjectRen() {
                 <button type="submit">Join Project</button>
                 {joinMessage && <p>{joinMessage}</p>}
             </form>
+            <h3>User Projects</h3>
+            <ul className="project-list">
+                {userProjects.map(project => (
+                    <li key={project.projectId} onClick={() => handleProjectClick(project.projectName)}>
+                        {project.projectId}
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 }

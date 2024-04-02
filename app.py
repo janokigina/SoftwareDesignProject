@@ -90,15 +90,18 @@ def create_project():
     data = request.json
     projectName = data.get('projectName')
     description = data.get('description')
-    projectId = data.get('projectId')  # Adjusted to 'projectId' for consistency
+    projectId = data.get('projectId')
+    userId = data.get('userId')
 
      # Check if user already exists
-    if projects.find_one({"projectId": id}):
+    if projects.find_one({"projectId": projectId}):
         return jsonify({"error": "Project already exists", "code": 409}), 409
     
     try:
         new_project = {"projectName": projectName, "description": description, "projectId": projectId}
         projects.insert_one(new_project)
+        # Associate project with the user
+        users.update_one({"id": userId}, {"$push": {"projects": projectId}})
         return jsonify({"message": "Project created successfully", "projectId": projectId, "code": 200}), 201
     except Exception as e:
         # Handle any database errors
@@ -106,43 +109,49 @@ def create_project():
     
 app.route('/join_project', methods=['POST'])
 def join_project():
-    data = request.get_json()
-    print("Received data:", data)  # Log the received data
-
-    join_project_id = data.get('joinProjectId')
-    user_id = data.get('id')
-    
+    data = request.json
+    projectId = data.get('projectId')
+    userId = data.get('userId')
 
     # Check if project ID is provided
-    if not join_project_id:
+    if not projectId:
         return jsonify({'error': 'Missing project ID'}), 400
 
+    # Check if the project exists
+    project = projects.find_one({"projectId": projectId})
+    if not project:
+        return jsonify({"error": "Project not found", "code": 404}), 404
+
+    # Check if the user has already joined the project
+    user = users.find_one({"id": userId, "projects": {"$in": [projectId]}})
+    if user:
+        return jsonify({"error": "User has already joined this project", "code": 400}), 400
+
+    # If the project exists and the user hasn't joined yet, add the project to the user's list
     try:
-        # Check if project exists
-        project = projects.find_one({"projectId": join_project_id})
-        if not project:
-            return jsonify({'error': 'Project not found'}), 404
-        
-        # Update the user's document
-        result = users.update_one({"id": user_id}, {"$push": {"projects": join_project_id}})
-        if result.modified_count > 0:
-            return jsonify({'message': 'Project joined successfully!'}), 200
-        else:
-            return jsonify({'error': 'Failed to join project'}), 500
+        users.update_one({"id": userId}, {"$push": {"projects": projectId}})
+        return jsonify({"message": "Successfully joined project", "projectId": projectId, "code": 200}), 200
     except Exception as e:
-        # Log the error (consider using logging library)
-        print(f"Database error: {e}")
-        return jsonify({'error': 'Database error'}), 500
+        return jsonify({"error": str(e), "code": 500}), 500
 
 
-
-
+@app.route('/get_user_projects', methods=['POST'])
+def get_user_projects():
+    data = request.json
+    userId = data.get('userId')
+    user = users.find_one({"id": userId})
+    if user:
+        projects_list = projects.find({"projectId": {"$in": user.get("projects", [])}})
+        projects_data = [{"projectName": proj["projectName"], "projectId": proj["projectId"]} for proj in projects_list]
+        return jsonify(projects_data), 200
+    else:
+        return jsonify({"error": "User not found", "code": 404}), 404
 
 # Resource Management Logic
 #
 #
 
-@app.route('/checkin', methods=['POST'])
+@app.route('/checkout', methods=['POST'])
 @cross_origin()
 def checkin():
     data = request.json
@@ -157,7 +166,7 @@ def checkin():
     else:
         return jsonify({"error": "Hardware set not found", "code": 404}), 404
 
-@app.route('/checkout', methods=['POST'])
+@app.route('/checkin', methods=['POST'])
 @cross_origin()
 def checkout():
     data = request.json
