@@ -104,16 +104,35 @@ def create_project():
         # Handle any database errors
         return jsonify({"error": str(e), "code": 500}), 500
     
-@app.route('/join_project', methods=['POST'])
+app.route('/join_project', methods=['POST'])
 def join_project():
-    data = request.json
-    projectId = data.get('projectId')
-    print
-    if projects.find_one({"projectId": projectId}):
-        return jsonify({"message": "Project created successfully", "projectId": projectId, "code": 200}), 200
-   
-    return jsonify({"error": "Project not found", "code": 404}), 404
+    data = request.get_json()
+    print("Received data:", data)  # Log the received data
 
+    join_project_id = data.get('joinProjectId')
+    user_id = data.get('id')
+    
+
+    # Check if project ID is provided
+    if not join_project_id:
+        return jsonify({'error': 'Missing project ID'}), 400
+
+    try:
+        # Check if project exists
+        project = projects.find_one({"projectId": join_project_id})
+        if not project:
+            return jsonify({'error': 'Project not found'}), 404
+        
+        # Update the user's document
+        result = users.update_one({"id": user_id}, {"$push": {"projects": join_project_id}})
+        if result.modified_count > 0:
+            return jsonify({'message': 'Project joined successfully!'}), 200
+        else:
+            return jsonify({'error': 'Failed to join project'}), 500
+    except Exception as e:
+        # Log the error (consider using logging library)
+        print(f"Database error: {e}")
+        return jsonify({'error': 'Database error'}), 500
 
 
 
