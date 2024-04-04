@@ -8,16 +8,15 @@
  * @component
  */
 import React, { useState } from 'react';
-import './CreateUser.css';
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from "react-router-dom";
+import './SignUp.css';
+import { useNavigate } from "react-router-dom";
 
-function CreateUser({ setLoggedIn }) {
+function SignUp({ setLoggedIn }) {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmpassword, setconfirmPassword] = useState('');
     const [id, setId] = useState('');
-    const [submitted, setSubmitted] = useState('flase');
     const [error, setError] = useState('false');
     const [createMessage, setCreateMessage] = useState('');
 
@@ -159,6 +158,4 @@ function CreateUser({ setLoggedIn }) {
     )
 }
 
-export default CreateUser;
-
-  
+export default SignUp;

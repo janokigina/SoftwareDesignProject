@@ -1,7 +1,7 @@
 
     
 import React, { useState, useEffect } from 'react';
-import {Navigate, useLocation} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 import './Project.css';
 import { useNavigate } from "react-router-dom";
 
@@ -12,7 +12,6 @@ function ProjectRen() {
     const [projectName, setProjectName] = useState('');
     const [description, setDescription] = useState('');
     const [projectId, setProjectId] = useState('');
-    const [projectjoinId, setProjectjoinId] = useState('');
     const [projectMessage, setProjectMessage] = useState('');
     const [joinMessage, setJoinMessage] = useState('');
     const [joinProjectId, setJoinProjectId] = useState('');

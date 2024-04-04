@@ -1,7 +1,7 @@
 import React, { useState , useEffect} from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import CreateUser from "./CreateUser";
-import MyForm from "./MyForm";
+import SignUp from "./SignUp";
+import LogIn from "./LogIn";
 import ProjectRen from "./Project";
 import ResourceManagement from "./Resource";
 import logo from './orange-logo.png';
@@ -42,8 +42,8 @@ function Welcome() {
       </div>
       <div className="content-area">
         <Routes>
-          <Route path="/create" element={<CreateUser setLoggedIn={setLoggedIn} />} />
-          <Route path="/signin" element={<MyForm setLoggedIn={setLoggedIn} />}></Route>
+          <Route path="/create" element={<SignUp setLoggedIn={setLoggedIn} />} />
+          <Route path="/signin" element={<LogIn setLoggedIn={setLoggedIn} />}></Route>
           <Route path="/projects" element={<ProjectRen/>}></Route>
           <Route path="/resources" element={<ResourceManagement />} />
         </Routes>

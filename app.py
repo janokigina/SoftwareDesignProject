@@ -107,7 +107,7 @@ def create_project():
         # Handle any database errors
         return jsonify({"error": str(e), "code": 500}), 500
     
-app.route('/join_project', methods=['POST'])
+@app.route('/join_project', methods=['POST'])
 def join_project():
     data = request.json
     projectId = data.get('projectId')

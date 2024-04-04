@@ -1,19 +1,13 @@
-
-
-
 /**
  * A React component that renders a form with input fields for the user to 
  * enter their name, password, and id.
  * @component
  */
 import React, { useState } from 'react';
-import './MyForm.css';
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import CreateUser from './CreateUser';
-import { Navigate } from "react-router-dom";
+import './LogIn.css';
 import { useNavigate } from "react-router-dom";
 
-function MyForm({ setLoggedIn }) {
+function LogIn({ setLoggedIn }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [id, setId] = useState('');
@@ -134,6 +128,4 @@ function MyForm({ setLoggedIn }) {
     )
 }
 
-export default MyForm;
-
-  
+export default LogIn;
