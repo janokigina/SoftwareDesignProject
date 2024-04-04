@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import './Resource.css';
 
@@ -10,7 +10,42 @@ function ResourceManagement() {
     const [requestSet1, setRequestSet1] = useState('');
     const [requestSet2, setRequestSet2] = useState('');
 
+    useEffect(() => {
+        fetchHardwareSets();
+    }, []);
+
+    const fetchHardwareSets = async () => {
+        console.log('GETTING HARDWARE SETS');
+        const fetchSetData = async (hwSetName) => {
+            const response = await fetch(`/get_hardware_set`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 'hwSetName': hwSetName }),
+            });
+            const data = await response.json();
+            console.log('Data:', data);
+            if (!response.ok) {
+                throw new Error('Failed to fetch');
+            }
+            return data;
+        };
+
+        try {
+            const hwSet1Data = await fetchSetData('HWSet1');
+            console.log('HWSet1 Data:', hwSet1Data);
+            const hwSet2Data = await fetchSetData('HWSet2');
+            console.log('HWSet2 Data:', hwSet2Data);
+            setHwSet1(hwSet1Data);
+            setHwSet2(hwSet2Data);
+        } catch (error) {
+            console.error("Error fetching hardware sets:", error);
+        }
+    };
+
     const updateHardwareSet = async (hwSetName, quantity, action) => {
+        console.log('UPDATING HARDWARE SETS');
         const endpoint = `/${action}`; // Use action parameter to choose between 'checkin' and 'checkout'
         const response = await fetch(endpoint, {
             method: 'POST',
@@ -46,6 +81,7 @@ function ResourceManagement() {
     const handleCheckOut = (hwSet, request) => {
         const requestNumber = parseInt(request, 10);
         if (!isNaN(requestNumber) && requestNumber > 0) {
+            console.log('Checking out', requestNumber, 'from', hwSet.name);
             updateHardwareSet(hwSet.name, requestNumber, 'checkout');
         } else {
             alert('Please enter a valid positive number');

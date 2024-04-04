@@ -151,7 +151,18 @@ def get_user_projects():
 #
 #
 
-@app.route('/checkout', methods=['POST'])
+@app.route('/get_hardware_set', methods=['POST'])
+def get_hardware_set():
+    data = request.json
+    hw_set_name = data.get('hwSetName')
+    hw_set = hardware_sets.find_one({"name": hw_set_name})
+    if hw_set:
+        hw_set['_id'] = str(hw_set['_id'])
+        return jsonify(hw_set), 200
+    else:
+        return jsonify({"error": "Hardware set not found", "code": 404}), 404
+
+@app.route('/checkin', methods=['POST'])
 @cross_origin()
 def checkin():
     data = request.json
@@ -160,13 +171,14 @@ def checkin():
 
     hw_set = hardware_sets.find_one({"name": hw_set_name})
     if hw_set:
+        old_availability = hw_set['availability']
         new_availability = min(hw_set['capacity'], hw_set['availability'] + quantity)
         hardware_sets.update_one({"name": hw_set_name}, {"$set": {"availability": new_availability}})
-        return jsonify({"message": f"Successfully checked in {quantity} units to {hw_set_name}.", "code": 200}), 200
+        return jsonify({"message": f"Successfully checked in {new_availability - old_availability} units to {hw_set_name}.", "code": 200}), 200
     else:
         return jsonify({"error": "Hardware set not found", "code": 404}), 404
 
-@app.route('/checkin', methods=['POST'])
+@app.route('/checkout', methods=['POST'])
 @cross_origin()
 def checkout():
     data = request.json
@@ -175,12 +187,10 @@ def checkout():
 
     hw_set = hardware_sets.find_one({"name": hw_set_name})
     if hw_set:
-        if hw_set['availability'] >= quantity:
-            new_availability = hw_set['availability'] - quantity
-            hardware_sets.update_one({"name": hw_set_name}, {"$set": {"availability": new_availability}})
-            return jsonify({"message": f"Successfully checked out {quantity} units from {hw_set_name}.", "code": 200}), 200
-        else:
-            return jsonify({"error": "Not enough available units to check out", "code": 400}), 400
+        old_availability = hw_set['availability']
+        new_availability = max(0, hw_set['availability'] - quantity)
+        hardware_sets.update_one({"name": hw_set_name}, {"$set": {"availability": new_availability}})
+        return jsonify({"message": f"Successfully checked out {old_availability - new_availability} units from {hw_set_name}.", "code": 200}), 200
     else:
         return jsonify({"error": "Hardware set not found", "code": 404}), 404
 
