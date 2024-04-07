@@ -13,4 +13,3 @@ root.render(
     <Welcome/>
   </React.StrictMode>
 );
-

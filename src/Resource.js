@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './Resource.css';
 
 function ResourceManagement() {
     const location = useLocation();
+    const navigate = useNavigate();
+    const [username, setUsername] = useState('');
     const projectName = location.state?.projectName || 'ProjectName';
     const [hwSet1, setHwSet1] = useState({ name: 'HWSet1', capacity: 100, availability: 10 });
     const [hwSet2, setHwSet2] = useState({ name: 'HWSet2', capacity: 100, availability: 20 });
@@ -11,11 +13,35 @@ function ResourceManagement() {
     const [requestSet2, setRequestSet2] = useState('');
 
     useEffect(() => {
-        fetchHardwareSets();
-    }, []);
+        const userId = localStorage.getItem("userId");
+
+        if (!userId) {
+            navigate("/login");
+        } else {
+            fetchHardwareSets();
+            fetch('/get_username_by_id', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ userId }),
+              })
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error('Failed to fetch username');
+                }
+                return response.json();
+              })
+              .then(data => {
+                setUsername(data.username);
+              })
+              .catch(error => {
+                console.error('Error fetching username:', error);
+              });
+        }
+    }, [navigate]);
 
     const fetchHardwareSets = async () => {
-        console.log('GETTING HARDWARE SETS');
         const fetchSetData = async (hwSetName) => {
             const response = await fetch(`/get_hardware_set`, {
                 method: 'POST',
@@ -25,7 +51,6 @@ function ResourceManagement() {
                 body: JSON.stringify({ 'hwSetName': hwSetName }),
             });
             const data = await response.json();
-            console.log('Data:', data);
             if (!response.ok) {
                 throw new Error('Failed to fetch');
             }
@@ -34,9 +59,7 @@ function ResourceManagement() {
 
         try {
             const hwSet1Data = await fetchSetData('HWSet1');
-            console.log('HWSet1 Data:', hwSet1Data);
             const hwSet2Data = await fetchSetData('HWSet2');
-            console.log('HWSet2 Data:', hwSet2Data);
             setHwSet1(hwSet1Data);
             setHwSet2(hwSet2Data);
         } catch (error) {
@@ -45,8 +68,7 @@ function ResourceManagement() {
     };
 
     const updateHardwareSet = async (hwSetName, quantity, action) => {
-        console.log('UPDATING HARDWARE SETS');
-        const endpoint = `/${action}`; // Use action parameter to choose between 'checkin' and 'checkout'
+        const endpoint = `/${action}`;
         const response = await fetch(endpoint, {
             method: 'POST',
             headers: {
@@ -63,9 +85,9 @@ function ResourceManagement() {
             } else if (hwSetName === 'HWSet2') {
                 setHwSet2(prev => ({ ...prev, availability: action === 'checkin' ? Math.min(prev.capacity, prev.availability + quantity) : Math.max(0, prev.availability - quantity) }));
             }
-            alert(data.message); // Display success message
+            alert(data.message);
         } else {
-            alert(data.error); // Display error message
+            alert(data.error);
         }
     };
 
@@ -81,7 +103,6 @@ function ResourceManagement() {
     const handleCheckOut = (hwSet, request) => {
         const requestNumber = parseInt(request, 10);
         if (!isNaN(requestNumber) && requestNumber > 0) {
-            console.log('Checking out', requestNumber, 'from', hwSet.name);
             updateHardwareSet(hwSet.name, requestNumber, 'checkout');
         } else {
             alert('Please enter a valid positive number');
@@ -90,7 +111,10 @@ function ResourceManagement() {
 
     return (
         <div className="resource-container">
-            <h1>{projectName}</h1>
+             <div className="header-container">
+                <h1>{projectName}</h1>
+                <button className="resource-back-button" onClick={() => navigate("/projects", { state: { username: username, valid: true } })}>Back to Projects</button>
+            </div>
             <div className="resource-section">
                 {/* HWSet1 Section */}
                 <h2>{hwSet1.name}</h2>

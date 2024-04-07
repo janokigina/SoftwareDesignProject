@@ -51,17 +51,19 @@ function LogIn({ setLoggedIn }) {
      */
     const handleSubmit = (event) => {
         event.preventDefault();
-        const data = { username, id, password }; // Removed ID
+        const data = { username, id, password };
         setSubmitted(true);
     
-        fetch('process_login', { // Changed to POST request
+        fetch('process_login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                return response.json().then(data => {
+                    throw new Error(data.error);
+                  });
             }
             return response.json();
         })

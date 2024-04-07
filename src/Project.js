@@ -1,5 +1,3 @@
-
-    
 import React, { useState, useEffect } from 'react';
 import {useLocation} from 'react-router-dom';
 import './Project.css';
@@ -16,8 +14,6 @@ function ProjectRen() {
     const [joinMessage, setJoinMessage] = useState('');
     const [joinProjectId, setJoinProjectId] = useState('');
     const [userProjects, setUserProjects] = useState([]);
-
-
 
     const handleSetProjectName = (event) => {
             setProjectName(event.target.value);
@@ -40,18 +36,16 @@ function ProjectRen() {
     }
 
     useEffect(() => {
-        if (location.state) {
-            const { username, id, valid } = location.state;
-            if (valid) {
-                setUser({ username, id, valid });
-            } else {
-                navigate("/signin");
-            }
+        const userId = localStorage.getItem("userId");
+
+        if (!userId) {
+            navigate("/login");
+        } else {
+            fetchUserProjects();
         }
-        fetchUserProjects();
-    }, [location, navigate]);
 
-
+    }, [navigate]);
+    
     const handleSubmit = async (event) => {
         event.preventDefault();
         const userId = localStorage.getItem("userId");
@@ -138,6 +132,28 @@ function ProjectRen() {
     const handleProjectClick = (projectName) => {
         navigate('/resources', { state: { projectName: projectName } });
     };
+
+    const removeUserFromProject = async (projectId) => {
+        const userId = localStorage.getItem("userId");
+        await fetch('/remove_user_from_project', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId, projectId }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                fetchUserProjects();
+            } else {
+                console.error('Error removing user from project:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error removing user from project:', error);
+        });
+    };
    
     return (
         <div>
@@ -182,21 +198,21 @@ function ProjectRen() {
             <h3>User Projects</h3>
             <ul className="project-list">
                 {userProjects.map(project => (
-                    <li key={project.projectId} onClick={() => handleProjectClick(project.projectName)}>
-                        {project.projectId}
+                    <li key={project.projectId} style={{ cursor: 'pointer' }}>
+                        <span onClick={() => handleProjectClick(project.projectName)}>
+                            {project.projectName} - {project.projectId}
+                        </span>
+                        <span 
+                            className="leave-project-icon" 
+                            onClick={(event) => removeUserFromProject(project.projectId, event)} 
+                            style={{ cursor: 'pointer', marginLeft: '10px', color: 'red' }}>
+                            🗑️
+                        </span>
                     </li>
                 ))}
             </ul>
         </div>
     );
 }
-
-const Project = () => {
-    return (
-      <>
-          <ProjectRen username="User" message="ok" />
-      </>
-    );
-  };
 
 export default ProjectRen;

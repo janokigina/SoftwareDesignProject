@@ -20,14 +20,12 @@ print("MongoDB URI: ", uri)
 # Create a new client and connect to the server
 client = MongoClient(uri, server_api=ServerApi('1'))
 
-
 UserDB = client.Users  
 ProjectDB = client.Projects
 projects = ProjectDB.project1
 users = UserDB.users1
 HardwareDB = client.HardwareSet
 hardware_sets = HardwareDB.HWSet1
-
 
 # Function to initialize hardware sets in the database
 def initialize_hardware_sets():
@@ -42,6 +40,24 @@ def initialize_hardware_sets():
 # Initialize hardware sets at the start of the application
 initialize_hardware_sets()
 
+@app.route('/get_username_by_id', methods=['POST'])
+def get_username_by_id():
+    data = request.json
+    userId = data.get('userId')
+
+    # Ensure userId is provided
+    if not userId:
+        return jsonify({"error": "User ID is required"}), 400
+
+    # Query the database for the user
+    user = users.find_one({"id": userId})
+
+    # If a user is found, return the username
+    if user:
+        return jsonify({"username": user["username"]}), 200
+    else:
+        return jsonify({"error": "User not found"}), 404
+
 
 #Login and Signup logic
 #
@@ -49,21 +65,24 @@ initialize_hardware_sets()
 @app.route('/process_login', methods=['POST'])
 @cross_origin()
 def process_login():
-
     data = request.json
     username = data.get('username')
     password = data.get('password')
-    id = data.get('id')
+    userId = data.get('id')  # Assuming 'id' is the key for userId in the request
 
-    user = users.find_one({"username": username})
+    # Find the user by username and userId
+    user = users.find_one({"username": username, "id": userId})
+
     if user:
+        # Check if the password matches
         if bcrypt.checkpw(password.encode('utf-8'), user["password"]):
-            return jsonify({"username": username, "code": 200}), 200
+            return jsonify({"username": username, "userId": userId, "code": 200}), 200
         else:
+            # Password does not match
             return jsonify({"error": "Invalid login credentials", "code": 401}), 401
     else:
+        # User not found by username and userId combination
         return jsonify({"error": "User not found", "code": 404}), 404
-
 
 @app.route('/process_signup', methods=['POST'])
 def process_signup():
@@ -75,7 +94,9 @@ def process_signup():
 
     # Check if user already exists
     if users.find_one({"id": id}):
-        return jsonify({"error": "User already exists", "code": 409}), 409
+        return jsonify({"error": "UserId already exists", "code": 409}), 409
+    if users.find_one({"username": username}):
+        return jsonify({"error": "Username already exists", "code": 409}), 409
 
     # Add user to database
     new_user = {"username": username, "password": hashed_password, "id": id, "projects": []}
@@ -93,9 +114,11 @@ def create_project():
     projectId = data.get('projectId')
     userId = data.get('userId')
 
-     # Check if user already exists
+     # Check if project already exists
     if projects.find_one({"projectId": projectId}):
-        return jsonify({"error": "Project already exists", "code": 409}), 409
+        return jsonify({"error": "ProjectId already exists", "code": 409}), 409
+    if projects.find_one({"projectName": projectName}):
+        return jsonify({"error": "ProjectName already exists", "code": 409}), 409
     
     try:
         new_project = {"projectName": projectName, "description": description, "projectId": projectId}
@@ -146,11 +169,41 @@ def get_user_projects():
         return jsonify(projects_data), 200
     else:
         return jsonify({"error": "User not found", "code": 404}), 404
+    
+@app.route('/remove_user_from_project', methods=['POST'])
+def remove_user_from_project():
+    data = request.json
+    projectId = data.get('projectId')
+    userId = data.get('userId')
+
+    # Check if user exists
+    user = users.find_one({"id": userId})
+    if not user:
+        return jsonify({"error": "User not found", "code": 404}), 404
+    
+    # Check if project ID is provided
+    if not projectId:
+        return jsonify({'error': 'Missing project ID'}), 400
+
+    # Check if the project exists
+    project = projects.find_one({"projectId": projectId})
+    if not project:
+        return jsonify({"error": "Project not found", "code": 404}), 404
+
+    # If the project and user exist, remove the project from the user's list
+    try:
+        result = users.update_one({"id": userId}, {"$pull": {"projects": projectId}})
+        if result.modified_count > 0:
+            return jsonify({"success": True, "message": "User removed from project successfully"}), 200
+        else:
+            return jsonify({"success": False, "message": "User not found in project or other error"}), 404
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
 
 # Resource Management Logic
 #
 #
-
 @app.route('/get_hardware_set', methods=['POST'])
 def get_hardware_set():
     data = request.json

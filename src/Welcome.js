@@ -13,14 +13,13 @@ function Welcome() {
 
 
   const handleLogout = () => {
-    // Implement your logout logic here
     setLoggedIn(false);
     localStorage.removeItem('userId');
   };
 
   useEffect(() => {
-    if (!loggedIn && window.location.pathname !== "/signin") {
-      window.location.href = "/signin"; // Redirect to login page if not logged in
+    if (!loggedIn && window.location.pathname !== "/login") {
+      window.location.href = "/login"; // Redirect to login page if not logged in
     }
   }, [loggedIn]);
 
@@ -31,19 +30,19 @@ function Welcome() {
         <h1>Welcome to Group1 Project</h1>
         <div>
           {loggedIn ? (
-            <Link to="/signin" onClick={handleLogout}>Log Out</Link>
+            <Link to="/login" onClick={handleLogout}>Log Out</Link>
           ) : (
             <>
-              <Link to="/create">Sign Up</Link>
-              <Link to="/signin">Log In</Link>
+              <Link to="/signup">Sign Up</Link>
+              <Link to="/login">Log In</Link>
             </>
           )}
         </div>
       </div>
       <div className="content-area">
         <Routes>
-          <Route path="/create" element={<SignUp setLoggedIn={setLoggedIn} />} />
-          <Route path="/signin" element={<LogIn setLoggedIn={setLoggedIn} />}></Route>
+          <Route path="/signup" element={<SignUp setLoggedIn={setLoggedIn} />} />
+          <Route path="/login" element={<LogIn setLoggedIn={setLoggedIn} />}></Route>
           <Route path="/projects" element={<ProjectRen/>}></Route>
           <Route path="/resources" element={<ResourceManagement />} />
         </Routes>

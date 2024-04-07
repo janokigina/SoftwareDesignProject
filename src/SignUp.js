@@ -1,7 +1,3 @@
-/* eslint-disable no-undef */
-
-
-
 /**
  * A React component that renders a form with input fields for the user to 
  * enter their name, password, and id.
@@ -78,7 +74,9 @@ function SignUp({ setLoggedIn }) {
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                return response.json().then(data => {
+                    throw new Error(data.error);
+                  });
             }
             return response.json();
         })
