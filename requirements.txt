@@ -51,7 +51,7 @@ pexpect==4.6.0
 pillow==10.2.0
 pyasn1==0.4.2
 pyasn1-modules==0.2.1
-PyGObject==3.48.2
+#PyGObject==3.48.2
 PyHamcrest==1.9.0
 PyJWT==1.7.1
 pymacaroons==0.13.0
@@ -78,7 +78,7 @@ six==1.14.0
 ssh-import-id==5.10
 systemd-python==234
 tomli==2.0.1
-Twisted==24.3.0
+#Twisted==24.3.0
 #ubuntu-advantage-tools==8001
 #ufw==0.36
 #unattended-upgrades==0.1
