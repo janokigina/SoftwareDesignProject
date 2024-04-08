@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/static/css/main.85191a8b.css",
+    "main.js": "/static/js/main.907796f5.js",
+    "static/media/orange-logo.png": "/static/media/orange-logo.36c736e8a93587a09053.png",
+    "index.html": "/index.html",
+    "main.85191a8b.css.map": "/static/css/main.85191a8b.css.map",
+    "main.907796f5.js.map": "/static/js/main.907796f5.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.85191a8b.css",
+    "static/js/main.907796f5.js"
+  ]
+}
